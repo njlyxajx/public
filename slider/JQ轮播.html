@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<style>
+	.play-box{
+		width: 1024px;
+		height: 576px;
+		margin: 150px auto;
+		position: relative;
+		overflow: hidden;
+	}
+	.img-box {
+		position: absolute;
+		top: 0;
+		left:0;
+		width: 6144px;
+		height:576px;
+		display: inline-block;
+		font-size:0px;
+	}
+
+
+	.icon ul{
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		position: absolute;
+		bottom: 20px;
+		left:50%;
+		margin-left: -45px;
+	}
+	.icon li{
+		height:20px;
+		width: 20px;
+		margin: 0 4px;
+		background-color: #fff;
+		float: left;
+		border-radius: 50%;
+		font-size: 0px;
+		cursor: pointer;
+	}
+	.icon li.cur{
+		background-color: orange;
+	}
+	.slidebar{
+		position: absolute;
+		top: 50%;
+		width:40px;
+		height:50px;
+		font-size: 20px;
+		font-family: simsun;
+		background-color: #fff;
+		color: #000;
+		font-weight: bold;
+		text-align: center;
+		line-height: 50px;
+		opacity: .7;
+		cursor: pointer;
+		display: none; 
+
+	}
+	.slidebar-left{
+		left:0;
+		border-radius:0 20px 20px 0;
+	}
+	.slidebar-right{
+		right: 0;
+		border-radius:20px 0 0 20px;
+	}
+</style>
+<body>
+	<div class="play-box">
+		<div class="img-box">
+			<a class="current" href="#">
+				<img src="1.jpg" alt="">
+			</a>
+			<a href="#">
+				<img src="2.jpg" alt="">
+			</a>
+			<a href="#">
+				<img src="3.jpg" alt="">
+			</a>
+			<a href="#">
+                <img src="4.jpg" alt="">
+			</a>
+			<a href="#">
+				<img src="5.jpg" alt="">
+			</a>
+			<a href="#">
+				<img src="1.jpg" alt="">
+			</a>
+		</div>
+		<div class="icon">
+			<ul>
+				<li class="cur">1</li>
+				<li>2</li>
+				<li>3</li>
+				<li>4</li>
+				<li>5</li>
+			</ul>
+		</div>
+
+			<div class="slidebar slidebar-left"><</div>
+			<div class="slidebar slidebar-right">></div>
+
+	</div>
+<script src="jquery.js"></script>
+<script>
+	$(document).ready(function(){
+		var speed = 3000;   //设定轮播时间
+		var m = 0;    	//m为当前显示的图片
+		var limWidth = 1024;   //设定动画宽度
+		var timer = setInterval(play, speed);    //设置自动播放定时器
+		var tranSpeed = 1000;    //设置切换需要的时间
+		//设置自动播放函数
+		function play(){
+			m ++;                  //设置下一张要显示的图片
+			if(m > 5){          //一共只有6张图 下标最大为5 判断大于5回归0
+				m = 1;				//因为大于5的时候显示的是第六张图片 其实就是第一张 没必要再从第一张显示所以m设置为1 下一张显示第二张图片
+				$(".img-box").css({
+					left:0           //播放到第六张时瞬间把left值设置成初始0 
+				})
+			}
+			$('.img-box').stop(false, true);   //防止用户快速点击左右鼠标移走时动画队列还在执行.stop()第一个参数是否保留当前动画队列我们选false第二个参数是立即执行完当前动画 
+			control(m);				//执行控制函数
+		}
+		
+		//控制图片显示
+		function control(n){
+			$(".img-box").animate({     //设置轮播动画
+				left: n * -limWidth
+			},tranSpeed);
+			$(".icon li").removeClass("cur").eq(n > 4 ? 0 : n).addClass("cur");   //控制下标激活状态如果n大于4就直接等于0 不然就等于自身 
+
+		}
+		//鼠标移入移除停止滑动图片
+		$(".play-box").mouseenter(function(){
+			clearInterval(timer);
+			$(".slidebar").show();        //左右控制箭头的淡入
+		}).mouseleave(function(){
+			timer = setInterval(play, speed);
+			$(".slidebar").hide();	//左右控制箭头的淡出
+		});
+		//圆点下标控制图片
+		$(".icon li").click(function(){
+			control($(this).index());
+			m = $(this).index();   //更改当前显示的m值
+		});
+
+		//右键控制图片 功能等同于自动播放下一张
+		$(".slidebar-right").click(function(){
+			play();
+		});
+		//左键控制图片
+		$(".slidebar-left").click(function(){
+			m -= 1;                		//显示上一张图片
+			if(m < 0){   						   								
+				m = 4;						// 当m小于0时下一张要显示的图片为第五张图片 所以m设定为4
+				$(".img-box").css({					
+					left: 5 * -limWidth     //因为考虑到动画的连贯性 先将left值从0瞬间更改为第六张的left值    
+				})  
+			}
+			control(m);             
+		});
+	});
+
+</script>
+</body>
+</html>
